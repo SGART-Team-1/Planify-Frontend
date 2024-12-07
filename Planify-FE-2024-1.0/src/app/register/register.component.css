@@ -48,21 +48,17 @@ body {
   margin-top: -15px;
   justify-content: center;
   margin-bottom: 20px;
-  max-width: 830px;
+  max-width: 800px;
   align-items: center;
 }
 
 .name-surnames {
-  display: flex;
-  flex-direction: row;
   justify-content: space-around;
-  margin-bottom: 20px;
   align-items: center;
+  margin-left: 3%;
   margin-top: 10px;
   width: 100%;
   gap: -20px;
-  margin-left: 8px;
-  margin-right: 10px;
 }
 .name {
   width: 300px;
@@ -91,8 +87,7 @@ input.name {
 }
 
 .surnames {
-  width: 350px;
-  margin-left: -20px;
+  width: 400px;
 }
 .compulsory-input-surnames {
   display: flex;
@@ -105,21 +100,22 @@ input.name {
   width: 300px;
 }
 .department-center {
-  display: flex;
-  gap: 30px;
+  justify-content: space-around;
+  align-items: start;
+  margin-left: 3%;
   margin-top: 10px;
-  margin-left: 40px;
-  margin-right: 50px;
+  width: 100%;
+  gap: -20px;
 }
 .opt-input-business {
   display: flex;
-  gap: 5px;
   flex-direction: row;
   align-items: center;
+  padding-left: 15px;
+  padding-bottom: 15px;
 }
 .compulsory-input-business {
   display: flex;
-  gap: 5px;
   flex-direction: row;
   align-items: center;
   position: relative;
@@ -130,7 +126,6 @@ input.name {
   gap: 30px;
   margin-bottom: 15px;
   margin-right: 50px;
-  margin-left: 40px;
 }
 
 .email-pwds-image {
@@ -144,7 +139,7 @@ input.name {
 }
 
 .email-pwds {
-  margin-left: 6%;
+  margin-left: 3%;
   margin-top: 10px;
 }
 
@@ -198,6 +193,8 @@ input.name {
   border-radius: 100%;
   border: 2px solid #d6d6d6;
   margin-bottom: 18px;
+  position:relative;
+  left: 10px;
   transition: border-color 0.3s, background-color 0.3s;
 }
 .interrogationImg:hover {
@@ -242,9 +239,9 @@ input.input-valid + .validation-icon img.right-icon {
 }
 
 .validation-icon {
-  position: absolute;
-  right: 10px;
-  top: 50%;
+  position: relative;
+  right: 40px;
+  top: 20px;
   transform: translateY(-50%);
   display: flex;
   align-items: center;
@@ -267,7 +264,6 @@ input.input-valid + .validation-icon img.right-icon {
   margin-bottom: 65px;
   margin-right: -10px;
 }
-
 .compulsory-icon-surnames {
   align-self: top;
   width: 33px;
@@ -313,10 +309,6 @@ input:hover {
   border: 3px solid #219ebc;
 }
 
-.showPwds {
-  width: 10px;
-}
-
 button {
   background-color: #219ebc;
   color: #fff;
@@ -342,6 +334,7 @@ fieldset {
   border: 1px solid #e0e0e0;
   border-width: 3px;
   border-radius: 25px;
+  width: 700px;
   background: #b3b3b3;
 }
 
@@ -378,10 +371,6 @@ a:hover {
   position: relative;
 }
 
-.showPwd {
-  width: 40px;
-}
-
 .show-password {
   display: flex;
   flex-direction: row;
@@ -399,7 +388,7 @@ a:hover {
 
 .show-validate-password {
   position: absolute;
-  right: 10px;
+  right: 40px;
   top: 50%;
   transform: translateY(-50%);
   display: flex;
