@@ -33,10 +33,7 @@ export class CallMeetingComponent {
   location: string = 'ESI';
   isOnline: boolean = false;
 
-
   state: string = ''; // SE ASIGNA UN ESTADO PREDETERMINADO COMO "Abierta"
-
-
 
   profileImage: string = '';
   observations: string = '';
@@ -47,6 +44,23 @@ export class CallMeetingComponent {
   organizerId: string = '';
   workSchedules: any;
 
+  checkingIssue: boolean=true;
+  checkingDate: boolean=true;
+  checkingInitTime: boolean=true;
+  checkingEndTime: boolean=true;
+  checkingLocation: boolean=true;
+
+  isInvalidIssue: boolean=true;
+  isInvalidDate: boolean=false;
+  isInvalidInitTime: boolean=false;
+  isInvalidEndTime: boolean=false;
+  isInvalidLocation: boolean=false;
+
+  errorIssue: string='Rellene este campo.';
+  errorDate: string='Rellene este campo.';
+  errorInitTime: string='Rellene este campo.';
+  errorEndTime: string='Rellene este campo.';
+  errorLocation: string='Rellene este campo.';
 
   constructor(private readonly route: ActivatedRoute, private readonly router: Router, private readonly dialog: MatDialog, private readonly client: HttpClient, private callMeetingService: CallMeetingService) { }
   private readonly apiUrl = environment.apiUrl + '/api/users';
@@ -120,6 +134,13 @@ export class CallMeetingComponent {
   }
 
   onDateChange() {
+    this.checkingDate=true;
+    if(this.meetingDate.trim()===''){
+      this.isInvalidDate=true;
+      this.errorDate='Rellene este campo.';
+    }else
+      this.isInvalidDate=false;
+      
     //Cuando la fecha cambia, se debe actualizar la lista de asistentes
     if (this.attendants.length > 0) {
       this.dialog.open(AdviseModalComponent, {
@@ -139,50 +160,47 @@ export class CallMeetingComponent {
 
 
   callMeeting(): void {
-    if (this.hasEmptyFields()) return;
-    if (this.isOutsideWorkHours()) return;
-    if (this.isMeetingDateInvalid()) return;
-    if (this.isStartTimeAfterEndTime()) return;
-    if (this.isMeetingSpanningMultipleWorkBlocks()) return;
-    if (this.isMeetingDurationTooShort()) return;
-    if (this.hasNoAttendants()) return;
+    let invalidMeeting=false;
+    this.checkAll();
+    if (this.isInvalidMeeting()) invalidMeeting=true;
+    if (this.isOutsideWorkHours()) invalidMeeting=true;
+    if (this.isMeetingDateInvalid()) invalidMeeting=true;
+    if (this.isStartTimeAfterEndTime()) invalidMeeting=true;
+    if (this.isMeetingSpanningMultipleWorkBlocks()) invalidMeeting=true;
+    if (this.isMeetingDurationTooShort()) invalidMeeting=true;
+    if (this.hasNoAttendants()) invalidMeeting=true;
 
-    this.createMeeting();
+    if (!invalidMeeting){
+      this.createMeeting();
+    }
   }
 
-   hasEmptyFields(): boolean {
-    if (this.issue === '' || this.meetingDate === '' || this.meetingInitTime === '' || this.meetingEndTime === '') {
-      this.dialog.open(AdviseModalComponent, {
-        disableClose: true, data: { titulo: 'Error', error: 'Por favor, rellene todos los campos', cancelar: false, aceptar: true }
-      });
-      return true;
-    }
-    return false;
+  isInvalidMeeting(){
+    return this.isInvalidDate || this.isInvalidEndTime || this.isInvalidInitTime || this.isInvalidIssue || this.isInvalidLocation;
   }
 
    isOutsideWorkHours(): boolean {
-    if (this.meetingInitTime < this.scheduleInitTime.slice(0.5) || this.meetingEndTime > this.schedulegEndTime.slice(0.5)) {
-      this.dialog.open(AdviseModalComponent, {
-        disableClose: true,
-        data: {
-          titulo: 'Error',
-          error: 'La hora de inicio y fin debe estar dentro del horario laboral \nInicio: ' + this.scheduleInitTime + '\nFin: ' + this.schedulegEndTime,
-          cancelar: false,
-          aceptar: true
-        }
-      });
-      return true;
+    let isInvalidWorkHour=false;
+    if (this.meetingInitTime < this.scheduleInitTime.slice(0.5)){
+      this.isInvalidInitTime=true;
+      this.errorInitTime='La hora de inicio debe estar dentro del horario laboral.';
+      isInvalidWorkHour= true;
     }
-    return false;
+      
+    if(this.meetingEndTime > this.schedulegEndTime.slice(0.5)) {
+      this.isInvalidEndTime=true;
+      this.errorEndTime='La hora de fin debe estar dentro del horario laboral.';
+      isInvalidWorkHour= true;
+    }
+    return isInvalidWorkHour;
   }
 
    isMeetingDateInvalid(): boolean {
     const today = new Date();
     const meetingDate = new Date(this.meetingDate);
     if (meetingDate < today) {
-      this.dialog.open(AdviseModalComponent, {
-        disableClose: true, data: { titulo: 'Error', error: 'La fecha de la reunión debe ser posterior a la fecha actual', cancelar: false, aceptar: true }
-      });
+      this.isInvalidDate=true;
+      this.errorDate='La fecha de la reunión debe ser posterior a la fecha actual';
       return true;
     }
     return false;
@@ -190,9 +208,8 @@ export class CallMeetingComponent {
 
    isStartTimeAfterEndTime(): boolean {
     if (this.meetingInitTime > this.meetingEndTime) {
-      this.dialog.open(AdviseModalComponent, {
-        disableClose: true, data: { titulo: 'Error', error: 'La hora de inicio debe ser menor a la hora de fin', cancelar: false, aceptar: true }
-      });
+      this.isInvalidInitTime=true;
+      this.errorInitTime='La hora de inicio debe ser menor a la hora de fin';
       return true;
     }
     return false;
@@ -204,15 +221,8 @@ export class CallMeetingComponent {
       const nextStart = this.workSchedules[i + 1].startHour;
 
       if (this.meetingInitTime < nextStart && this.meetingEndTime > currentEnd) {
-        this.dialog.open(AdviseModalComponent, {
-          disableClose: true,
-          data: {
-            titulo: 'Error',
-            error: 'La reunión no puede abarcar múltiples bloques de horario laboral',
-            cancelar: false,
-            aceptar: true
-          }
-        });
+        this.isInvalidEndTime=true;
+        this.errorEndTime='La reunión no puede abarcar múltiples bloques de horario laboral';
         return true;
       }
     }
@@ -225,9 +235,8 @@ export class CallMeetingComponent {
     const diff = endTime.getTime() - initTime.getTime();
     const minutes = Math.floor(diff / 60000);
     if (minutes < 30) {
-      this.dialog.open(AdviseModalComponent, {
-        disableClose: true, data: { titulo: 'Error', error: 'La reunión debe durar al menos 30 minutos', cancelar: false, aceptar: true }
-      });
+      this.isInvalidEndTime=true;
+      this.errorEndTime='La reunión debe durar al menos 30 minutos';
       return true;
     }
     return false;
@@ -256,9 +265,6 @@ export class CallMeetingComponent {
       }
     );
   }
-
-
-
   setInitDate() {
     // Obtén la fecha actual
     const today = new Date();
@@ -274,15 +280,69 @@ export class CallMeetingComponent {
     this.meetingDate = formattedDate;
   }
   onAllDayChange() {
+    if(!this.isAllDay){
+      this.isInvalidInitTime=false;
+      this.isInvalidEndTime=false;
+    }else{
+      this.onInitTimeChange();
+      this.onEndTimeChange();
+    }
     this.isAllDay = !this.isAllDay;
   }
 
-
-
   onOnlineChange() {
+    if(!this.isOnline){
+      this.isInvalidLocation=false;
+    }else
+      this.onLocationChange();
     this.isOnline = !this.isOnline;
     this.location = this.isOnline ? 'Online' : 'ESI';
   }
+
+  onIssueChange(){
+    this.checkingIssue=true;
+    if(this.issue.trim()===''){
+      this.isInvalidIssue=true;
+    }else
+      this.isInvalidIssue=false;
+  }
+
+  onInitTimeChange(){
+    this.checkingInitTime=true;
+    if(this.meetingInitTime.trim()===''){
+      this.isInvalidInitTime=true;
+    }else
+      this.isInvalidInitTime=false;
+    this.onEndTimeChange();
+    this.onDateChange();
+  }
+
+  onEndTimeChange(){
+    this.checkingEndTime=true;
+    if(this.meetingEndTime.trim()===''){
+      this.isInvalidEndTime=true;
+    }else
+      this.isInvalidEndTime=false;
+    this.onInitTimeChange();
+    this.onDateChange();
+  }
+
+  onLocationChange(){
+    this.checkingLocation=true;
+    if(this.location.trim()===''){
+      this.isInvalidLocation=true;
+    }else
+      this.isInvalidLocation=false;
+  }
+
+  checkAll(){
+    this.checkingLocation=false;
+    this.checkingEndTime=false;
+    this.checkingInitTime=false;
+    this.checkingIssue=false;
+    this.checkingDate=false;
+  }
+
   deleteAttendant(id: string) {
     this.attendants = this.attendants.filter(attendant => attendant.id !== id);
   }
@@ -307,12 +367,8 @@ export class CallMeetingComponent {
     dialogRef.afterClosed().subscribe(result => {
       this.attendants = result;
       this.attendants = result.sort((a: User, b: User) => a.surnames.localeCompare(b.surnames));; //usado para el filtro
-
-
     });
   }
-
-
 
   compareTimes(time1: string, time2: string): number {
     const [hours1, minutes1] = time1.split(':').map(Number);
