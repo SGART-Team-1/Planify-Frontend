@@ -10,6 +10,10 @@ import { AddAbsenceComponent } from './absences/add-absence/add-absence.componen
 import { MeetingCalendarComponent } from './meeting-calendar/meeting-calendar.component';
 import { FullCalendarModule } from '@fullcalendar/angular';
 
+// Importaciones necesarias para el diálogo
+import { MatDialogModule } from '@angular/material/dialog';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -24,6 +28,8 @@ import { FullCalendarModule } from '@fullcalendar/angular';
     AddAbsenceComponent,
     MeetingCalendarComponent,
     FullCalendarModule,
+    MatDialogModule, // Módulo para el diálogo de Angular Material
+    BrowserAnimationsModule // Necesario para las animaciones del diálogo
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
