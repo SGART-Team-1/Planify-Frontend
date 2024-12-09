@@ -9,9 +9,9 @@ import { MatDialog } from '@angular/material/dialog';
   providedIn: 'root'
 })
 export class AddAbsenceService {
- 
+
   constructor(private readonly client: HttpClient, private readonly dialog: MatDialog) { }
-  
+
   private readonly apiUrl = environment.apiUrl + '/absences';
 
   confirmAbsence(allDayLong: boolean, fromDate: string, fromTime: string, toDate: string, toTime: string, absenceType: string): Observable<any> {
@@ -25,18 +25,38 @@ export class AddAbsenceService {
       absenceType: absenceType,
       userId: userId,
       overlapsMeeting: false
-    }
-    return new Observable((observer)=> {
-      this.client.put(this.apiUrl+'/checkMeetingOverlap', info).subscribe((response) => {
+    };
+
+    return new Observable((observer) => {
+      this.client.put(this.apiUrl + '/checkMeetingOverlap', info).subscribe((response) => {
         if (response === true) {
           const dialogRef = this.dialog.open(AdviseModalComponent, {
-            disableClose: true, data: { titulo: 'Confirmar Acción', error: 'El usuario tiene alguna reunión que se solapa con la ausencia, aceptar las cancelará o rechazará.', cancelar: true, aceptar: true }
+            disableClose: true, 
+            data: {
+              titulo: 'Confirmar Acción',
+              error: 'El usuario tiene alguna reunión que se solapa con la ausencia, aceptar las cancelará o rechazará.',
+              cancelar: true,
+              aceptar: true
+            }
           });
+
           dialogRef.afterClosed().subscribe(result => {
             if (result === true) {
               info.overlapsMeeting = true;
-              this.client.post(this.apiUrl+'/create', info).subscribe(
-                (res) => {
+              this.client.post(this.apiUrl + '/create', info).subscribe(
+                (res: string[]) => {
+                  // NUEVO: Manejar los mensajes devueltos por el backend
+                  if (res && res.length > 0) { 
+                    const dialogRef = this.dialog.open(AdviseModalComponent, {
+                      data: {
+                        titulo: 'Resultado de la ausencia',
+                        error: res.join('\n'), // Mostrar mensajes concatenados con saltos de línea
+                        cancelar: false,
+                        aceptar: false
+                      }
+                    });
+                  }
+                  // FIN NUEVO
                   observer.next(res);
                   observer.complete();
                 },
@@ -48,8 +68,20 @@ export class AddAbsenceService {
             }
           });
         } else {
-          this.client.post(this.apiUrl+'/create', info).subscribe(
-            (res) => {
+          this.client.post(this.apiUrl + '/create', info).subscribe(
+            (res: string[]) => {
+              // NUEVO: Manejar los mensajes devueltos por el backend
+              if (res && res.length > 0) { 
+                const dialogRef = this.dialog.open(AdviseModalComponent, {
+                  data: {
+                    titulo: 'Resultado de la ausencia',
+                    error: res.join('\n'), // Mostrar mensajes concatenados con saltos de línea
+                    cancelar: false,
+                    aceptar: false
+                  }
+                });
+              }
+              // FIN NUEVO
               observer.next(res);
               observer.complete();
             },
@@ -60,3 +92,8 @@ export class AddAbsenceService {
     });
   }
 }
+
+
+// Formato de respuestas del back:
+// "Se ha rechazado la reunión: " + nombre de reunión
+// "Se ha cancelado la reunión: " + nombre de reunión
