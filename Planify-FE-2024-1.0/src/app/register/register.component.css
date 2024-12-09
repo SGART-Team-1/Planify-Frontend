@@ -122,9 +122,7 @@ input.name {
 }
 
 .profile-discharge_date {
-  display: flex;
   gap: 30px;
-  margin-bottom: 15px;
   margin-right: 50px;
 }
 
@@ -239,7 +237,7 @@ input.input-valid + .validation-icon img.right-icon {
 }
 
 .validation-icon {
-  position: relative;
+  position: static;
   right: 40px;
   top: 20px;
   transform: translateY(-50%);
@@ -369,6 +367,7 @@ a:hover {
   font-size: 1.2rem;
   text-align: center;
   position: relative;
+  bottom:10px;
 }
 
 .show-password {

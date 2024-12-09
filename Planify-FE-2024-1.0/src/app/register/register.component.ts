@@ -35,12 +35,14 @@ export class RegisterComponent {
   profileImageUrl: string | ArrayBuffer | null =
     '../../assets/register/userDefault.png';
   
-  errorEmail: string = 'Este formato de email no es válido.';
+  errorEmail: string = 'Rellene este campo.';
   errorName: string = 'Rellene este campo.';
   errorSurnames: string = 'Rellene este campo.';
-  errorPwd1: string = 'La contraseña debe contener al menos:\n- 8 caracteres\n- 1 mayúscula\n- 1 minúscula\n- 1 carácter especial\n- 1 número';
-  errorPwd2: string = 'No coincide con la contraseña';
-  error: string = '';;
+  errorCenter: string = 'Rellene este campo.';
+  errorDate: string = 'Rellene este campo.';
+  errorPwd1: string = 'Rellene este campo.';
+  errorPwd2: string = 'Rellene este campo.';
+  error: string = '';
   showPassword: boolean = false;
 
   isInvalidName: boolean = true;
@@ -95,7 +97,7 @@ export class RegisterComponent {
                   data: { qr_code: resultado.qr_code },
                 }
               );
-              dialogRef.afterClosed().subscribe((resultado: any) => { //COmprobar, he metido la pezuña GONZALO
+              dialogRef.afterClosed().subscribe((resultado: any) => {
                 if (resultado) {
                   this.router.navigate(['/']);
                   window.scrollTo(0, 0);
@@ -114,15 +116,31 @@ export class RegisterComponent {
 
   validateName(): void {
     this.checkingName = true;
+    if(this.name.trim()===''){
+      this.errorName='Rellene este campo.';
+      this.isInvalidName=true;
+    }
     // Si contiene números u otros caracteres, se marca como inválido.
-    this.isInvalidName = this.noNumbers(this.name);
+    else if(this.noNumbers(this.name)){
+      this.errorName='Este campo no debe contener números.';
+      this.isInvalidName=true;
+    }else
+      this.isInvalidName=false;
     this.checkFormValidity();
   }
 
   validateSurnames(): void {
     this.checkingSurnames = true;
+    if(this.surnames.trim()===''){
+      this.errorSurnames='Rellene este campo.';
+      this.isInvalidSurnames=true;
+    }
     // Si contiene números u otros caracteres, se marca como inválido.
-    this.isInvalidSurnames = this.noNumbers(this.surnames);
+    else if(this.noNumbers(this.surnames)){
+      this.errorSurnames='Este campo no debe contener números.';
+      this.isInvalidSurnames=true;
+    }else
+      this.isInvalidSurnames=false;
     this.checkFormValidity();
   }
 
@@ -152,15 +170,31 @@ export class RegisterComponent {
 
   validatePassword(): void {
     this.checkingPassword = true;
-    this.isInvalidPassword = this.passwordRequirements(this.pwd1);
+    if(this.pwd1.trim()===''){
+      this.errorPwd1='Rellene este campo.';
+      this.isInvalidPassword=true;
+    }
+    // Si contiene números u otros caracteres, se marca como inválido.
+    else if(this.passwordRequirements(this.pwd1)){
+      this.errorPwd1='La contraseña debe contener al menos 8 caracteres, 1 mayúscula, 1 minúscula, 1 carácter especial y 1 número.';
+      this.isInvalidPassword = true;
+    }else
+      this.isInvalidPassword=false;
     this.validatePassword2();
     this.checkFormValidity();
   }
 
   validatePassword2(): void {
     this.checkingPassword2 = true;
-    this.isInvalidPassword2 =
-      this.pwd1 !== this.pwd2 || this.passwordRequirements(this.pwd2);
+    if(this.pwd2.trim()===''){
+      this.errorPwd2='Rellene este campo.';
+      this.isInvalidPassword2=true;
+    }
+    else if(this.pwd1 !== this.pwd2){
+      this.errorPwd2='No coincide con la contraseña';
+      this.isInvalidPassword2=true;
+    }else
+      this.isInvalidPassword2=false;
     this.checkFormValidity();
   }
 
@@ -209,7 +243,15 @@ export class RegisterComponent {
   validateEmail(): void {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     this.checkingEmail = true;
-    this.isInvalidEmail = !emailRegex.test(this.email);
+    if(this.email.trim()===''){
+      this.errorEmail='Rellene este campo.';
+      this.isInvalidEmail=true;
+    }
+    else if(!emailRegex.test(this.email)){
+      this.errorEmail='Este formato de email no es válido.';
+      this.isInvalidEmail = true;
+    }else
+      this.isInvalidEmail=false;
     this.checkFormValidity();
   }
 
