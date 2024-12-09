@@ -22,11 +22,12 @@ export class SidebarComponent implements OnInit {
 
   // Propiedades para notificaciones
   notificationCount: number = 3; // Inicialmente 3 notificaciones
-  notifications: string[] = [
-    "Reunión programada para mañana",
-    "Cambio en la hora de una reunión",
-    "Nueva reunión pendiente"
+  notifications: { message: string; reading_date: string | null }[] = [
+    { message: "Reunión programada para mañana", reading_date: null },
+    { message: "Cambio en la hora de una reunión", reading_date: null },
+    { message: "Nueva reunión pendiente", reading_date: "2024-12-08T12:00:00Z" },
   ];
+  
   showNotifications: boolean = false;
 
   constructor(
@@ -38,6 +39,7 @@ export class SidebarComponent implements OnInit {
 
   ngOnInit(): void {
     console.log('SidebarComponent inicializado');
+    this.sortNotifications(); 
     if (typeof window !== "undefined") {
       const user = window.localStorage.getItem("user") as string;
       if (user) {
@@ -79,7 +81,7 @@ export class SidebarComponent implements OnInit {
   }
 
   // Método para actualizar dinámicamente las notificaciones
-  addNotification(notification: string): void {
+  addNotification(notification: {message: string; reading_date: string | null}): void {
     this.notifications.push(notification);
     this.notificationCount = this.notifications.length; // Actualiza el conteo dinámico
   }
@@ -97,4 +99,21 @@ export class SidebarComponent implements OnInit {
       width: '400px'
     });
   }
+
+  sortNotifications(): void {
+    this.notifications.sort((a: {reading_date: string | null}, b: {reading_date: string | null}) => {
+      if (a.reading_date === null && b.reading_date !== null) return -1;
+      if (a.reading_date !== null && b.reading_date === null) return 1;
+      return 0;
+    });
+  }
+
+  markAsRead(notification: any, index: number): void {
+    if (!notification.reading_date) {
+      notification.reading_date = new Date().toISOString(); // Marcar como leída
+      this.sortNotifications(); // Reordenar notificaciones
+      console.log(`Notificación en el índice ${index} marcada como leída.`);
+    }
+  }
+  
 }

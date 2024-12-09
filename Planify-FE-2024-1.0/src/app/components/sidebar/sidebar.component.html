@@ -15,8 +15,11 @@
       </button>
       <div *ngIf="showNotifications" class="notifications-dropdown">
         <ul>
-          <li *ngFor="let notification of notifications; let i = index" (click)="openNotificationDetail(notification)">
-            {{ notification }}
+          <li *ngFor="let notification of notifications; let i = index"
+          [ngClass]="{'unread': !notification.reading_date, 'read': notification.reading_date}"
+          (click)="markAsRead(notification, i)"
+          (click)="openNotificationDetail(notification.message)">
+            {{ notification.message }}
             <button class="delete-button" (click)="removeNotification(i, $event)">
               <i class="fa fa-circle-xmark"></i>
             </button>

@@ -157,6 +157,7 @@
   white-space: nowrap; /* Evita que el texto ocupe múltiples líneas */
   overflow: hidden; /* Oculta el texto que no cabe */
   text-overflow: ellipsis; /* Muestra puntos suspensivos si el texto es demasiado largo */
+  cursor: pointer;
 }
 
 .notifications-dropdown li:last-child {
@@ -181,6 +182,18 @@
 .notifications-dropdown li:hover .delete-button {
   visibility: visible; /* Muestra la cruz al pasar el cursor */
   opacity: 1;
+}
+
+.unread {
+  background-color: white;
+  color: black;
+  font-weight: normal;
+}
+
+.read {
+  background-color: #f0f0f0;
+  color: #888;
+  font-weight: normal;
 }
 
 /* Media queries para hacer el diseño responsive */
