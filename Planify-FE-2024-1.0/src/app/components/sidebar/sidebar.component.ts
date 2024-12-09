@@ -84,6 +84,13 @@ export class SidebarComponent implements OnInit {
     this.notificationCount = this.notifications.length; // Actualiza el conteo dinámico
   }
 
+  removeNotification(index: number, event: Event): void {
+    event.stopPropagation(); 
+    this.notifications.splice(index, 1); // Elimina la notificación del array
+    this.notificationCount = this.notifications.length; // Actualiza el contador
+    console.log(`Notificación en el índice ${index} eliminada.`);
+  }  
+
   openNotificationDetail(notification: string): void {
     this.dialog.open(NotificationDetailComponent, {
       data: { notification }, // Pasar la notificación al pop-up

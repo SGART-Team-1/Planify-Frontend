@@ -144,12 +144,13 @@
 
 .notifications-dropdown ul {
   list-style: none;
-  padding: 10px;
+  padding: 0;
   margin: 0;
 }
 
 .notifications-dropdown li {
-  padding: 10px;
+  position: relative;
+  padding: 10px 40px 10px 10px;
   border-bottom: 1px solid #ddd;
   color: black;
   font-size: 12px;
@@ -160,6 +161,26 @@
 
 .notifications-dropdown li:last-child {
   border-bottom: none;
+}
+
+.delete-button {
+  position: absolute;
+  right: 10px; /* Ubicación en la parte derecha */
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: red;
+  font-size: 1rem;
+  cursor: pointer;
+  visibility: hidden; /* Oculta la cruz por defecto */
+  transition: visibility 0.3s ease, opacity 0.3s ease;
+  opacity: 0;
+}
+
+.notifications-dropdown li:hover .delete-button {
+  visibility: visible; /* Muestra la cruz al pasar el cursor */
+  opacity: 1;
 }
 
 /* Media queries para hacer el diseño responsive */
