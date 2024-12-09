@@ -20,20 +20,24 @@
                     <div class="gi-input-container">
                       <div class="div-row">
                         <div class="input-container input-issue">
-                          <strong>
+                          <strong class="input-title">
                             Asunto
                           </strong>
                           <input
-                            class="input-issue"
+                            [ngClass]="{
+                              'input-issue': true,
+                              'input-invalid': isInvalidIssue && !checkingIssue,
+                              'input-valid': !isInvalidIssue && issue && !checkingIssue
+                            }"
                             type="text"
                             [(ngModel)]="issue"
                             placeholder="Asunto"
                             [readonly]="!isEditing"
-
+                            (change)="onIssueChange()"
                           />
                               
                         </div>
-                              <div *ngIf="!isEditing" class="input-container input-state">
+                          <div *ngIf="!isEditing" class="input-container input-state">
                           <input
                             class="input-state"
                             type="text"
@@ -49,13 +53,18 @@
                         </div>
                       </div>
                     </div>
+                    <span class="error-message" style="color: red" *ngIf="isInvalidIssue && !checkingIssue"> {{ errorIssue }} </span>
                     <div class="gi-input-container">
                       <div class="input-container">
-                          <strong>
+                          <strong class="input-title">
                             Fecha
                           </strong>
                         <input
-                          class="input-date"
+                          [ngClass]="{
+                            'input-time': true,
+                            'input-invalid': isInvalidDate && !checkingDate,
+                            'input-valid': !isInvalidDate && meetingDate && !checkingDate
+                          }"
                           type="date"
                           [(ngModel)]="meetingDate"
                           placeholder="Fecha"
@@ -63,11 +72,25 @@
                           (change)="onDateChange()"
                         />
                       </div>
+                    </div>
+                    <span class="error-message" style="color: red" *ngIf="isInvalidDate && !checkingDate"> {{ errorDate }} </span>
+                    <div class="gi-input-container" *ngIf="isAllDay || isEditing">
+                      <div class="input-container all-day" *ngIf="isAllDay || isEditing">
+                        <strong> Día Completo</strong>
+                        <div class="checkbox-wrapper" >
+                          <input id="_checkbox-26" type="checkbox" [(ngModel)]="isAllDay" (click)="onAllDayChange()" [disabled]=!isEditing>
+                          <label for="_checkbox-26">
+                            <div class="tick_mark"></div>
+                          </label>    
+                        </div>
+                      </div>
+                    </div>
+                    <div class="gi-input-container" *ngIf="!isAllDay || isEditing">
                       <div class="input-container" *ngIf="!isAllDay || isEditing">
                         <strong
                           [ngClass]="{
-                            'disabled':
-                            isAllDay
+                            'disabled': isAllDay,
+                            'input-title': true
                         }">
                           Inicio
                         </strong>
@@ -77,119 +100,127 @@
                           [(ngModel)]="meetingInitTime"
                           placeholder="Hora Inicio"
                           [ngClass]="{
-                                  'disabled':
-                                  isAllDay
+                            'disabled': isAllDay,
+                            'input-invalid': isInvalidInitTime && !checkingInitTime,
+                            'input-valid': !isInvalidInitTime && meetingInitTime && !checkingInitTime
                           }"
                           [readonly]="isAllDay || !isEditing"
+                          (change)="onInitTimeChange()"
                         />
                       </div>
-                              <div class="input-container" *ngIf="!isAllDay || isEditing">
+                    </div>
+                    <span class="error-message" style="color: red" *ngIf="isInvalidInitTime && !checkingInitTime"> {{ errorInitTime }} </span>
+                    <div class="gi-input-container" *ngIf="!isAllDay || isEditing">
+                      <div class="input-container" *ngIf="!isAllDay || isEditing">
                         <strong
                           [ngClass]="{
-                                  'disabled':
-                                  isAllDay
-                                }">
+                            'disabled':isAllDay,
+                            'input-title': true
+                          }">
                           Fin
                         </strong>
                         <input
                           class="input-time"
                           type="time"
                           [(ngModel)]="meetingEndTime"
+                          (change)="onEndTimeChange()"
                           placeholder="Hora Fin"
                           [ngClass]="{
-                                      'disabled':
-                                      isAllDay
+                            'disabled':
+                            isAllDay,
+                            'input-title': true,
+                            'input-invalid': isInvalidEndTime && !checkingEndTime,
+                            'input-valid': !isInvalidEndTime && meetingEndTime && !checkingEndTime
                           }"
                           [readonly]="isAllDay || !isEditing"
                         />
                       </div>
-                              <div class="input-container all-day" *ngIf="isAllDay || isEditing"
-                      >
-                        <strong> Día Completo</strong>
-                                <div class="checkbox-wrapper" >
-                                  <input id="_checkbox-26" type="checkbox" [(ngModel)]="isAllDay" (click)="onAllDayChange()" [disabled]=!isEditing>
-                          <label for="_checkbox-26">
-                            <div class="tick_mark"></div>
-                          </label>
-                                  
-                        </div>
-                                
-
-                      </div>
                     </div>
-                    <div class="gi-input-container">
-                      <div class="div-row">
-                                <div *ngIf="!isOnline || isEditing" class="input-container">
+                    <span class="error-message" style="color: red" *ngIf="isInvalidEndTime && !checkingEndTime"> {{ errorEndTime }} </span>
+                    <div class="gi-input-container" *ngIf="isOnline || isEditing" >
+                      <div class="input-container all-day" *ngIf="isOnline || isEditing">
+                        <strong class="input-title">Online</strong>
+                        <div class="checkbox-wrapper">
+                            <input id="_checkbox-location" type="checkbox" [(ngModel)]="isOnline" (click)="onOnlineChange()" [disabled]=!isEditing>
+                          <label for="_checkbox-location">
+                        <div class="tick_mark"></div>
+                      </label>
+                        </div>
+                    </div>
+                  </div>
+                    <div class="gi-input-container"*ngIf="!isOnline || isEditing">
+                      <div class="input-container all-day"*ngIf="!isOnline || isEditing">
+                        <div *ngIf="!isOnline || isEditing" class="input-container">
                           <strong
                             [ngClass]="{
-                                    'disabled':
-                                    isOnline
-                                  }">
+                              'disabled': isOnline,
+                              'input-title': true
+                            }">
                             Localización
                           </strong>
-                                    <select *ngIf="isEditing" 
-                            type="text"
-                            [(ngModel)]="location"
-                            placeholder="Localización"
-                            [ngClass]="{
-                                      'disabled':
-                                      isOnline
-                            }"
-                                    [disabled]="isOnline">
-                            <option value="ESI">ESI</option>
-                                    <option value="POLITECNICO">Edificio Politécnico</option>
-                            <option value="ALU">ALU</option>
-                            <option value="Oficina">Oficina</option>
-                            <option value="Despacho">Despacho</option>
-                            <option value="Biblioteca">Biblioteca</option>
-                            <option value="Cafeteria">Cafetería</option>
-                          </select>
-                                  <input *ngIf="!isEditing" class="location-input" [(ngModel)]="location" readonly>
-                                
-                        </div>
-                                <div *ngIf="isOnline || isEditing" class="input-container all-day"
-                        >
-                          <strong>Online</strong>
-                          <div class="checkbox-wrapper">
-                                    <input id="_checkbox-location" type="checkbox" [(ngModel)]="isOnline" (click)="onOnlineChange()" [disabled]=!isEditing>
-                            <label for="_checkbox-location">
-                              <div class="tick_mark"></div>
-                            </label>
+                              <select *ngIf="isEditing" 
+                              type="text"
+                              [(ngModel)]="location"
+                              placeholder="Localización"
+                              (change)="onLocationChange()"
+                              [ngClass]="{
+                                'disabled':isOnline,
+                                'input-invalid': isInvalidLocation && !checkingLocation,
+                                'input-valid': !isInvalidLocation && location && !checkingLocation
+                              }"
+                              [disabled]="isOnline">
+                              <option value="ESI">ESI</option>
+                              <option value="POLITECNICO">Edificio Politécnico</option>
+                              <option value="ALU">ALU</option>
+                              <option value="Oficina">Oficina</option>
+                              <option value="Despacho">Despacho</option>
+                              <option value="Biblioteca">Biblioteca</option>
+                              <option value="Cafeteria">Cafetería</option>
+                            </select>
+                            <input *ngIf="!isEditing" class="location-input" [(ngModel)]="location" readonly>    
                           </div>
                         </div>
-                                <div *ngIf="!isEditing && !isOrganizer" class="input-container invitation-div"                                   [ngClass]="{
+                      </div>
+                      <span class="error-message" style="color: red" *ngIf="isInvalidLocation && !checkingLocation"> {{ errorLocation }} </span>
+                      <div class="gi-input-container" *ngIf="!isEditing && !isOrganizer">
+                          <div *ngIf="!isEditing && !isOrganizer" class="input-container invitation-div"
+                          [ngClass]="{
                             'state-closed': invitationState === 'RECHAZADA',
                             'state-opened': invitationState === 'ACEPTADA',
                             'state-pending': invitationState === 'PENDIENTE'
                                 }">
-                                  <strong class = "invitation">Invitación </strong>
+                          <strong class = "invitation">Invitación</strong>
                           <input
-                                  class = "invitation"
-                                  type="text"
-                                  [(ngModel)]="invitationState"
-                                  placeholder="Invitación"
-                                  readonly
-                                />
-                                </div>
-                                <div *ngIf="(invitationState === 'ACEPTADA' || (isOrganizer && !isEditing) || !attendanceAvailable) && !isEditing" class="input-container all-day"
-                                >
-                                  <strong>Asistir</strong>
-                                  <div class="checkbox-wrapper">
-                                    <input id="_checkbox-location" type="checkbox" [(ngModel)]="attending" (click)="onAttendingChange()" [disabled]="attending || !attendanceAvailable">
-                                    <label for="_checkbox-location">
-                                      <div class="tick_mark"></div>
-                                    </label>
+                          class = "invitation"
+                          type="text"
+                          [(ngModel)]="invitationState"
+                          placeholder="Invitación"
+                          readonly
+                        />
+                        </div>
+                      </div>
+                      <div class="gi-input-container"*ngIf="(invitationState === 'ACEPTADA' || (isOrganizer && !isEditing) || !attendanceAvailable) && !isEditing">
+                        <div *ngIf="(invitationState === 'ACEPTADA' || (isOrganizer && !isEditing) || !attendanceAvailable) && !isEditing" class="input-container all-day">
+                          <strong>Asistir</strong>
+                          <div class="checkbox-wrapper">
+                            <input id="_checkbox-location" type="checkbox" [(ngModel)]="attending" (click)="onAttendingChange()" [disabled]="attending || !attendanceAvailable">
+                            <label for="_checkbox-location">
+                              <div class="tick_mark"></div>
+                            </label>
                                     
                           </div>
                         </div>
-                      </div>
                     </div>
-                            
+                        <textarea
+                          class="input-observations"
+                          type="text"
+                          [(ngModel)]="observations"
+                          placeholder="Observaciones (Opcional)"
+                          [readonly]="!isEditing"
+                        ></textarea>
                   </div>
                   <div class="uploadImg">
-                            <fieldset
-                              class="fieldImg"
-                            >
+                    <fieldset class="fieldImg">
                       <a class="title-organizer">Organizador</a>
                       <img
                         class="organizerImage"
@@ -207,13 +238,6 @@
                     </fieldset>
                   </div>
                 </div>
-                <textarea
-                  class="input-observations"
-                  type="text"
-                  [(ngModel)]="observations"
-                  placeholder="Observaciones (Opcional)"
-                  [readonly]="!isEditing"
-                ></textarea>
               </div>
 
             </fieldset>

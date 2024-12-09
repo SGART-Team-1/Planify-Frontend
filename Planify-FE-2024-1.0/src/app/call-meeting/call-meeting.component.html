@@ -60,8 +60,7 @@
                               >
                                 <strong style="width: 120px;"> Día Completo</strong>
                                 <div class="checkbox-wrapper">
-                                  <input id="_checkbox-26" type="checkbox" [(ngModel)]="isAllDay" (click)="onAllDayChange()"
-                                  (change)="onDateChange()">
+                                  <input id="_checkbox-26" type="checkbox" [(ngModel)]="isAllDay" (click)="onAllDayChange()">
                                   <label for="_checkbox-26">
                                     <div class="tick_mark"></div>
                                   </label>                 
@@ -121,8 +120,7 @@
                             </div>
                             <span class="error-message" style="color: red" *ngIf="isInvalidEndTime && !checkingEndTime"> {{ errorEndTime }} </span>
                             <div class="gi-input-container">
-                              <div class="input-container all-day"
-                              >
+                              <div class="input-container all-day">
                                 <strong style="width: 120px;">Online</strong>
                                 <div class="checkbox-wrapper">
                                   <input id="_checkbox-location" type="checkbox" [(ngModel)]="isOnline" (click)="onOnlineChange()">
@@ -147,8 +145,7 @@
                                   placeholder="Localización"
                                   (change)="onLocationChange()"
                                   [ngClass]="{
-                                    'disabled':
-                                    isOnline,
+                                    'disabled': isOnline,
                                     'input-invalid': isInvalidLocation && !checkingLocation,
                                     'input-valid': !isInvalidLocation && location && !checkingLocation
                                   }"
