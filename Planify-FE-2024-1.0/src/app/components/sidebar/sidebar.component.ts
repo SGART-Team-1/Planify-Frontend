@@ -12,22 +12,16 @@ import { NotificationDetailComponent } from './notification-detail.component';
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [NgIf, NgFor, CommonModule, RouterModule], // Asegúrate de incluir CommonModule
+  imports: [NgIf, NgFor, CommonModule, RouterModule],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.css'
 })
 export class SidebarComponent implements OnInit {
   actualUser: AppUser = {} as AppUser;
-  private readonly apiUrl = environment.apiUrl + '/api/users';
+  private readonly apiUrl = environment.apiUrl;
 
-  // Propiedades para notificaciones
-  notificationCount: number = 3; // Inicialmente 3 notificaciones
-  notifications: { message: string; reading_date: string | null }[] = [
-    { message: "Reunión programada para mañana", reading_date: null },
-    { message: "Cambio en la hora de una reunión", reading_date: null },
-    { message: "Nueva reunión pendiente", reading_date: "2024-12-08T12:00:00Z" },
-  ];
-  
+  notificationCount: number = 0; // Inicializado dinámicamente
+  notifications: { id: string; message: string; reading_date: string | null }[] = [];
   showNotifications: boolean = false;
 
   constructor(
@@ -39,7 +33,6 @@ export class SidebarComponent implements OnInit {
 
   ngOnInit(): void {
     console.log('SidebarComponent inicializado');
-    this.sortNotifications(); 
     if (typeof window !== "undefined") {
       const user = window.localStorage.getItem("user") as string;
       if (user) {
@@ -56,6 +49,9 @@ export class SidebarComponent implements OnInit {
             } else {
               this.actualUser.photo = 'data:image/png;base64,' + this.actualUser.photo;
             }
+
+            // Cargar notificaciones del backend
+            this.loadNotifications();
           },
           (error: any) => {
             console.error('Error fetching user:', error);
@@ -67,53 +63,106 @@ export class SidebarComponent implements OnInit {
 
   // Método para obtener el usuario
   getUser(jwt: string): Observable<any> {
-    return this.client.get(this.apiUrl + "/validateJWT");
+    return this.client.get(`${this.apiUrl}/api/users/validateJWT`);
   }
 
-  // Método para cerrar sesión
-  logOut(): void {
-    this.router.navigate(["/home"]);
+  // Método para cargar las notificaciones del backend
+  loadNotifications(): void {
+    this.client.get<{ id: string; message: string; reading_date: string | null }[]>(
+      `${this.apiUrl}/notifications/user`,
+      {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+      }
+    ).subscribe(
+      (notifications) => {
+        this.notifications = notifications;
+        this.updateUnreadCount(); // Actualizar el conteo después de cargar
+        this.sortNotifications();
+      },
+      (error) => {
+        console.error('Error loading notifications:', error);
+      }
+    );
   }
+
+  updateUnreadCount(): void {
+    this.notificationCount = this.notifications.filter(n => n.reading_date === null).length;
+  }
+  
 
   // Método para alternar las notificaciones
   toggleNotifications(): void {
     this.showNotifications = !this.showNotifications;
   }
 
-  // Método para actualizar dinámicamente las notificaciones
-  addNotification(notification: {message: string; reading_date: string | null}): void {
-    this.notifications.push(notification);
-    this.notificationCount = this.notifications.length; // Actualiza el conteo dinámico
+  // Método para marcar notificación como leída
+  markAsRead(notification: any, index: number): void {
+    if (!notification.reading_date) {
+      this.client.patch(
+        `${this.apiUrl}/notifications/${notification.id}/read`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+        }
+      ).subscribe(
+        () => {
+          notification.reading_date = new Date().toISOString();
+          this.updateUnreadCount(); // Actualizar el conteo dinámicamente
+          this.sortNotifications();
+          console.log(`Notificación en el índice ${index} marcada como leída.`);
+        },
+        (error) => {
+          console.error('Error marking notification as read:', error);
+        }
+      );
+    }
   }
+  
 
+  // Método para descartar una notificación
   removeNotification(index: number, event: Event): void {
-    event.stopPropagation(); 
-    this.notifications.splice(index, 1); // Elimina la notificación del array
-    this.notificationCount = this.notifications.length; // Actualiza el contador
-    console.log(`Notificación en el índice ${index} eliminada.`);
-  }  
+    event.stopPropagation();
+    const notification = this.notifications[index];
+    this.client.patch(
+      `${this.apiUrl}/notifications/${notification.id}/discard`,
+      {},
+      {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+      }
+    ).subscribe(
+      () => {
+        this.notifications.splice(index, 1); // Eliminar notificación de la lista
+        this.updateUnreadCount(); // Actualizar el conteo dinámicamente
+        console.log(`Notificación en el índice ${index} eliminada.`);
+      },
+      (error) => {
+        console.error('Error discarding notification:', error);
+      }
+    );
+  }
+  
+  
 
+  // Método para abrir el detalle de una notificación
   openNotificationDetail(notification: string): void {
     this.dialog.open(NotificationDetailComponent, {
-      data: { notification }, // Pasar la notificación al pop-up
-      width: '400px'
+      data: { notification },
+      width: '400px',
     });
   }
 
+  // Método para ordenar las notificaciones
   sortNotifications(): void {
-    this.notifications.sort((a: {reading_date: string | null}, b: {reading_date: string | null}) => {
+    this.notifications.sort((a, b) => {
       if (a.reading_date === null && b.reading_date !== null) return -1;
       if (a.reading_date !== null && b.reading_date === null) return 1;
       return 0;
     });
   }
-
-  markAsRead(notification: any, index: number): void {
-    if (!notification.reading_date) {
-      notification.reading_date = new Date().toISOString(); // Marcar como leída
-      this.sortNotifications(); // Reordenar notificaciones
-      console.log(`Notificación en el índice ${index} marcada como leída.`);
-    }
-  }
   
+
+  // Método para cerrar sesión
+  logOut(): void {
+    this.router.navigate(["/home"]);
+  }
 }
