@@ -86,7 +86,9 @@ export class SidebarComponent implements OnInit {
   }
 
   updateUnreadCount(): void {
+    console.log('Total notifications:', this.notifications.length);
     this.notificationCount = this.notifications.filter(n => n.reading_date === null).length;
+    console.log('Unread notifications:', this.notificationCount);
   }
   
 
