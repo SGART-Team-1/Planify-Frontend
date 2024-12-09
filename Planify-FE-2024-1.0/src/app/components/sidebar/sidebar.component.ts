@@ -21,7 +21,7 @@ export class SidebarComponent implements OnInit {
   private readonly apiUrl = environment.apiUrl;
 
   notificationCount: number = 0; // Inicializado dinámicamente
-  notifications: { id: string; message: string; reading_date: string | null }[] = [];
+  notifications: { id: string; message: string; reading_date: any | null }[] = [];
   showNotifications: boolean = false;
 
   constructor(
@@ -68,15 +68,18 @@ export class SidebarComponent implements OnInit {
 
   // Método para cargar las notificaciones del backend
   loadNotifications(): void {
-    this.client.get<{ id: string; message: string; reading_date: string | null }[]>(
+    this.client.get<{ id: string; message: string; readingDate: string | null }[]>(
       `${this.apiUrl}/notifications/user`,
       {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       }
     ).subscribe(
       (notifications) => {
-        this.notifications = notifications;
-        this.updateUnreadCount(); // Actualizar el conteo después de cargar
+        this.notifications = notifications.map(notification => ({
+          ...notification,
+          reading_date: notification.readingDate ? new Date(notification.readingDate) : null // Conversión explícita
+        }));
+        this.updateUnreadCount();
         this.sortNotifications();
       },
       (error) => {
@@ -84,11 +87,11 @@ export class SidebarComponent implements OnInit {
       }
     );
   }
+  
 
   updateUnreadCount(): void {
-    console.log('Total notifications:', this.notifications.length);
-    this.notificationCount = this.notifications.filter(n => n.reading_date === null).length;
-    console.log('Unread notifications:', this.notificationCount);
+    this.notificationCount = this.notifications.filter(n => n.reading_date == null).length;
+    console.log("Las notificaciones son: ", this.notificationCount);
   }
   
 
@@ -156,9 +159,9 @@ export class SidebarComponent implements OnInit {
   // Método para ordenar las notificaciones
   sortNotifications(): void {
     this.notifications.sort((a, b) => {
-      if (a.reading_date === null && b.reading_date !== null) return -1;
-      if (a.reading_date !== null && b.reading_date === null) return 1;
-      return 0;
+      if (a.reading_date == null && b.reading_date != null) return -1; // Coloca no leídos al final
+      if (a.reading_date != null && b.reading_date == null) return 1; // Coloca leídos al principio
+      return (b.reading_date?.getTime() || 0) - (a.reading_date?.getTime() || 0); // Ordena por fecha
     });
   }
   
