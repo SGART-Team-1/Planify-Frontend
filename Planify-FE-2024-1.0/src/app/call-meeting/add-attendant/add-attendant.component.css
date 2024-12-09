@@ -67,13 +67,11 @@ legend {
 /*Show chosen attendants*/
 .attendants-list {
   width: calc(100% - 5px);
-  height: calc(100% - 90px);
-  overflow-y: auto;
   resize: none;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  padding: 10px 10px 10px 10px;
+  gap: 20px;
+  padding: 20px 20px 20px 20px;
 }
 
 .attendant-card {

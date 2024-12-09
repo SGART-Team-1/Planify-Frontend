@@ -26,30 +26,18 @@
               placeholder="Nombre"
               (input)="validateName()"
               [ngClass]="{
-                'input-invalid': isInvalidName && !isEmptyName,
-                'input-valid': !isInvalidName && name && !isEmptyName
+                'input-invalid': isInvalidName && !checkingName,
+                'input-valid': !isInvalidName && name && !checkingName
               }"
               required
             />
-            <span class="validation-icon">
-              <span
-                *ngIf="isInvalidName && !isEmptyName"
-                class="error-message"
-                title="Nombre no válido"
-              >
-                <img
-                  class="error-icon"
-                  src="../../assets/register/wrong.png"
-                  alt="Wrong"
-                />
-              </span>
-            </span>
           </div>
+          <span class="error-message" style="color: red" *ngIf="isInvalidName && !checkingName"> {{ errorName }} </span>
 
           <div class="compulsory-input-surnames">
             <span class="compulsory-message" title="Campo obligatorio">
               <img
-                class="compulsory-icon-surnames"
+                class="compulsory-icon"
                 src="../../assets/register/compulsory.png"
                 alt="Compulsory"
               />
@@ -63,26 +51,14 @@
               placeholder="Apellidos"
               (input)="validateSurnames()"
               [ngClass]="{
-                'input-invalid': isInvalidSurnames && !isEmptySurnames,
+                'input-invalid': isInvalidSurnames && !checkingSurnames,
                 'input-valid':
-                  !isInvalidSurnames && surnames && !isEmptySurnames
+                  !isInvalidSurnames && surnames && !checkingSurnames
               }"
               required
             />
-            <span class="validation-icon">
-              <span
-                *ngIf="isInvalidSurnames && !isEmptySurnames"
-                class="error-message"
-                title="Apellidos no válidos"
-              >
-                <img
-                  class="error-icon"
-                  src="../../assets/register/wrong.png"
-                  alt="Wrong"
-                />
-              </span>
-            </span>
           </div>
+          <span class="error-message" style="color: red" *ngIf="isInvalidSurnames && !checkingSurnames"> {{ errorSurnames }} </span>
         </div>
       </fieldset>
 
@@ -98,13 +74,16 @@
               />
             </span>
             <input
-              class="input-business"
               type="text"
               id="center"
               name="center"
               [(ngModel)]="center"
               placeholder="Centro"
-              (change)="checkFormValidity()"
+              (input)="validateCenter()"
+              [ngClass]="{
+                'input-invalid': isInvalidCenter && !checkingCenter,
+                'input-valid': !isInvalidCenter && center && !checkingCenter
+              }"
               required
             />
             <span
@@ -118,6 +97,41 @@
               />
             </span>
           </div>
+          <span class="error-message" style="color: red" *ngIf="isInvalidCenter && !checkingCenter"> {{ errorCenter }} </span>
+
+          <div class="profile-discharge_date">
+            <div class="compulsory-input-business">
+              <span class="compulsory-message" title="Campo obligatorio">
+                <img
+                  class="compulsory-icon-business"
+                  src="../../assets/register/compulsory.png"
+                  alt="Compulsory"
+                />
+              </span>
+              <input
+                type="date"
+                id="discharge_date"
+                name="discharge_date"
+                [(ngModel)]="discharge_date"
+                placeholder="Fecha de Alta"
+                (input)="validateDate()"
+                [ngClass]="{
+                  'input-invalid': isInvalidDate && !checkingDate,
+                  'input-valid': !isInvalidDate && discharge_date && !checkingDate
+                }"
+                required
+              />
+              <span class="help-icon" title="Fecha de alta en la empresa">
+                <img
+                  class="interrogationImg"
+                  src="../../assets/register/interrogation.png"
+                  alt="Interrogation"
+                />
+              </span>
+            </div>
+            <span class="error-message" style="color: red" *ngIf="isInvalidDate && !checkingDate"> {{ errorDate }} </span>
+           </div> 
+
           <div class="opt-input-business">
             <input
               class="input-business"
@@ -131,35 +145,6 @@
               class="help-icon"
               title="Departamento al que pertenece dentro de la empresa"
             >
-              <img
-                class="interrogationImg"
-                src="../../assets/register/interrogation.png"
-                alt="Interrogation"
-              />
-            </span>
-          </div>
-        </div>
-
-        <div class="profile-discharge_date">
-          <div class="compulsory-input-business">
-            <span class="compulsory-message" title="Campo obligatorio">
-              <img
-                class="compulsory-icon-business"
-                src="../../assets/register/compulsory.png"
-                alt="Compulsory"
-              />
-            </span>
-            <input
-              class="input-business"
-              type="date"
-              id="discharge_date"
-              name="discharge_date"
-              [(ngModel)]="discharge_date"
-              placeholder="Fecha de Alta"
-              (change)="checkFormValidity()"
-              required
-            />
-            <span class="help-icon" title="Fecha de alta en la empresa">
               <img
                 class="interrogationImg"
                 src="../../assets/register/interrogation.png"
@@ -212,26 +197,14 @@
                   placeholder="Correo Electrónico"
                   (input)="validateEmail()"
                   [ngClass]="{
-                    'input-invalid': isInvalidEmail && !isEmptyEmail,
-                    'input-valid': !isInvalidEmail && email && !isEmptyEmail
+                    'input-invalid': isInvalidEmail && !checkingEmail,
+                    'input-valid': !isInvalidEmail && email && !checkingEmail
                   }"
                   required
                 />
-                <span class="validation-icon">
-                  <span
-                    *ngIf="isInvalidEmail && !isEmptyEmail"
-                    class="error-message"
-                    title="Correo no válido"
-                  >
-                    <img
-                      class="validation-icon-Account error-icon-pwd"
-                      src="../../assets/register/wrong.png"
-                      alt="Wrong"
-                    />
-                  </span>
-                </span>
               </div>
             </div>
+            <span class="error-message" style="color: red" *ngIf="isInvalidEmail && !checkingEmail"> {{ errorEmail }} </span>
 
             <div class="compulsory-input-business">
               <span class="compulsory-message" title="Campo obligatorio">
@@ -249,8 +222,8 @@
                 placeholder="Contraseña"
                 (input)="validatePassword()"
                 [ngClass]="{
-                  'input-invalid': isInvalidPassword && !isEmptyPassword,
-                  'input-valid': !isInvalidPassword && pwd1 && !isEmptyPassword
+                  'input-invalid': isInvalidPassword && !checkingPassword,
+                  'input-valid': !isInvalidPassword && pwd1 && !checkingPassword
                 }"
                 required
               />
@@ -270,48 +243,25 @@
                 alt="ShowPassword"
               />
             </button>
-              <span class="validation-icon-pwd1">
-                <span
-                  *ngIf="isInvalidPassword && !isEmptyPassword"
-                  class="error-message"
-                  title="La contraseña no cumple con los requisitos"
-                >
-                  <img
-                    class="validation-icon-Account error-icon-pwd pwd1"
-                    src="../../assets/register/wrong.png"
-                    alt="Wrong"
-                  />
-                </span>
-                <span
-                  *ngIf="!isInvalidPassword && !isEmptyPassword"
-                  class="error-message"
-                  title="Contraseña válida"
-                >
-                  <img
-                    class="validation-icon-Account right-icon pwd1"
-                    src="../../assets/register/right.png"
-                    alt="Right"
-                  />
-                </span>
-              
-              </span>
             </div>
               <span
                 class="help-icon"
                 title="La contraseña debe contener al menos:
-- 8 caracteres mínimo
-- 1 mayúscula
-- 1 minúscula
-- 1 carácter especial
-- 1 número"
+                - 8 caracteres mínimo
+                - 1 mayúscula
+                - 1 minúscula
+                - 1 carácter especial
+                - 1 número"
               >
                 <img
-                  class="interrogationImg-account"
+                  class="interrogationImg"
                   src="../../assets/register/interrogation.png"
                   alt="Interrogation"
                 />
               </span>
             </div>
+            <span class="error-message" style="color: red" *ngIf="isInvalidPassword && !checkingPassword"> {{ errorPwd1 }} </span>
+            
             <div class="compulsory-input-business">
               <span class="compulsory-message" title="Campo obligatorio">
                 <img
@@ -322,54 +272,31 @@
               </span>
               <input
                 [type]="showPassword ? 'text' : 'password'"
-                placeholder="Confirmar Contraseña"
                 id="pwd2"
                 name="pwd2"
                 [(ngModel)]="pwd2"
-                (input)="validatePassword2()"
+                placeholder="Confirmar contraseña"
+                (input)="validatePassword()"
                 [ngClass]="{
-                  'input-invalid': isInvalidPassword2 && !isEmptyPassword2,
-                  'input-valid':
-                    !isInvalidPassword2 && pwd2 && !isEmptyPassword2
+                  'input-invalid': isInvalidPassword2 && !checkingPassword2,
+                  'input-valid': !isInvalidPassword2 && pwd2 && !checkingPassword2
                 }"
                 required
               />
-              <span class="validation-icon">
-                <span
-                  *ngIf="isInvalidPassword2 && !isEmptyPassword2"
-                  class="error-message"
-                  title="No coincide con la contraseña"
-                >
-                  <img
-                    class="validation-icon-Account error-icon-pwd"
-                    src="../../assets/register/wrong.png"
-                    alt="Wrong"
-                  />
-                </span>
-                <span
-                  *ngIf="!isInvalidPassword2 && !isEmptyPassword2"
-                  class="error-message"
-                  title="Contraseña válida"
-                >
-                  <img
-                    class="validation-icon-Account right-icon"
-                    src="../../assets/register/right.png"
-                    alt="Right"
-                  />
-                </span>
-              </span>
+              <div class="show-validate-password">
+            </div>
               <span
                 class="help-icon"
-                title="Repita la contraseña que ha escrito previamente"
+                title="Repita la contraseña que ha escrito anteriormente"
               >
                 <img
-                  class="interrogationImg-account"
+                  class="interrogationImg"
                   src="../../assets/register/interrogation.png"
                   alt="Interrogation"
                 />
               </span>
             </div>
-
+            <span class="error-message" style="color: red" *ngIf="isInvalidPassword2 && !checkingPassword2"> {{ errorPwd2 }} </span>
           </div>
 
           <fieldset class="uploadImg">
@@ -395,8 +322,7 @@
         Registrarse
       </button>
       <p>¿Ya tienes cuenta? <a [routerLink]="'/login'">Iniciar sesión</a></p>
-
       <span class="error-message" style="color: red"> {{ error }} </span>
-    </form>
+    </form>    
   </div>
 </body>

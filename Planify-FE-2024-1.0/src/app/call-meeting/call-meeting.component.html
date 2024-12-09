@@ -18,33 +18,58 @@
                     <div class="general-info-photo">
                         <div class="general-info">
                             <div class="gi-input-container">
-                              <div class="input-container input-issue">
-                                <strong>
+                              <div class="input-container">
+                                <strong style="width: 120px;">
                                   Asunto
                                   </strong>
                                 <input
-                                class="input-issue"
+                                (change)="onIssueChange()"
                                 type="text"
+                                [ngClass]="{
+                                  'input-issue': true,
+                                  'input-invalid': isInvalidIssue && !checkingIssue,
+                                  'input-valid': !isInvalidIssue && issue && !checkingIssue
+                                }"
                                 [(ngModel)]="issue"
                                 placeholder="Asunto"
-                            />
+                              />
+                              </div>
                             </div>
-                        </div>
+                            <span class="error-message" style="color: red" *ngIf="isInvalidIssue && !checkingIssue"> {{ errorIssue }} </span>
                             <div class="gi-input-container">
                               <div class="input-container">
-                                <strong>
+                                <strong style="width: 120px;">
                                   Fecha
                                   </strong>
                                     <input
-                                    class="input-date"
                                     type="date"
                                     [(ngModel)]="meetingDate"
+                                    [ngClass]="{
+                                      'input-time': true,
+                                      'input-invalid': isInvalidDate && !checkingDate,
+                                      'input-valid': !isInvalidDate && meetingDate && !checkingDate
+                                    }"
                                     (change)="onDateChange()"
                                     placeholder="Fecha"
                                 />
                               </div>
+                            </div>
+                            <span class="error-message" style="color: red" *ngIf="isInvalidDate && !checkingDate"> {{ errorDate }} </span>
+                            <div class="gi-input-container">
+                              <div class="input-container all-day"
+                              >
+                                <strong style="width: 120px;"> Día Completo</strong>
+                                <div class="checkbox-wrapper">
+                                  <input id="_checkbox-26" type="checkbox" [(ngModel)]="isAllDay" (click)="onAllDayChange()">
+                                  <label for="_checkbox-26">
+                                    <div class="tick_mark"></div>
+                                  </label>                 
+                                </div>
+                              </div>
+                            </div>
+                            <div class="gi-input-container">
                               <div class="input-container">
-                                <strong
+                                <strong style="width: 120px;"
                                 [ngClass]="{
                                   'disabled':
                                   isAllDay
@@ -55,17 +80,22 @@
                                 class="input-time"
                                 type="time"
                                 [(ngModel)]="meetingInitTime"
-                                (change)="onDateChange()"
+                                (change)="onInitTimeChange()"
                                 placeholder="Hora Inicio"
                                 [ngClass]="{
                                   'disabled':
-                                  isAllDay
+                                  isAllDay,
+                                  'input-invalid': isInvalidInitTime && !checkingInitTime,
+                                  'input-valid': !isInvalidInitTime && meetingInitTime && !checkingInitTime
                                 }"
                                 [readonly]="isAllDay"
-                            />
+                                />
                               </div>
+                            </div>
+                            <span class="error-message" style="color: red" *ngIf="isInvalidInitTime && !checkingInitTime"> {{ errorInitTime }} </span>
+                            <div class="gi-input-container">
                               <div class="input-container">
-                                <strong        
+                                <strong style="width: 120px;"        
                                   [ngClass]="{
                                   'disabled':
                                   isAllDay
@@ -76,33 +106,33 @@
                                     class="input-time"
                                     type="time"
                                     [(ngModel)]="meetingEndTime"
-                                    (change)="onDateChange()"
+                                    (change)="onEndTimeChange()"
                                     placeholder="Hora Fin"
                                     [ngClass]="{
                                       'disabled':
-                                      isAllDay
+                                      isAllDay,
+                                      'input-invalid': isInvalidEndTime && !checkingEndTime,
+                                      'input-valid': !isInvalidEndTime && meetingEndTime && !checkingEndTime
                                     }"
                                     [readonly]="isAllDay"
                                 />
-                                </div>
-                              <div class="input-container all-day"
-                              >
-                                <strong> Día Completo</strong>
+                              </div>
+                            </div>
+                            <span class="error-message" style="color: red" *ngIf="isInvalidEndTime && !checkingEndTime"> {{ errorEndTime }} </span>
+                            <div class="gi-input-container">
+                              <div class="input-container all-day">
+                                <strong style="width: 120px;">Online</strong>
                                 <div class="checkbox-wrapper">
-                                  <input id="_checkbox-26" type="checkbox" [(ngModel)]="isAllDay" (click)="onAllDayChange()"
-                                  (change)="onDateChange()">
-                                  <label for="_checkbox-26">
+                                  <input id="_checkbox-location" type="checkbox" [(ngModel)]="isOnline" (click)="onOnlineChange()">
+                                  <label for="_checkbox-location">
                                     <div class="tick_mark"></div>
                                   </label>
-                                  
                                 </div>
-                                
-
                               </div>
                             </div>
                             <div class="gi-input-container">
                               <div class="input-container">
-                                <strong                                   
+                                <strong style="width: 120px;"                                   
                                 [ngClass]="{
                                   'disabled':
                                   isOnline
@@ -113,9 +143,11 @@
                                   type="text"
                                   [(ngModel)]="location"
                                   placeholder="Localización"
+                                  (change)="onLocationChange()"
                                   [ngClass]="{
-                                    'disabled':
-                                    isOnline
+                                    'disabled': isOnline,
+                                    'input-invalid': isInvalidLocation && !checkingLocation,
+                                    'input-valid': !isInvalidLocation && location && !checkingLocation
                                   }"
                                   [disabled]="isOnline">
                                   <option value="ESI">ESI</option>
@@ -128,24 +160,18 @@
                                 </select>
                               
                               </div>
-                              <div class="input-container all-day"
-                              >
-                                <strong>Online</strong>
-                                <div class="checkbox-wrapper">
-                                  <input id="_checkbox-location" type="checkbox" [(ngModel)]="isOnline" (click)="onOnlineChange()">
-                                  <label for="_checkbox-location">
-                                    <div class="tick_mark"></div>
-                                  </label>
-                                  
-                                </div>
-                                
-
-                              </div>
                             </div>
-                            
+                            <span class="error-message" style="color: red" *ngIf="isInvalidLocation && !checkingLocation"> {{ errorLocation }} </span>
+                            <textarea
+                              class="input-observations"
+                              type="text"
+                              [(ngModel)]="observations"
+                              placeholder="Observaciones (Opcional)"
+                            ></textarea>
+                          </div>
                         </div>
                         <div class="uploadImg">
-                            <fieldset
+                          <fieldset
                               class="fieldImg"
                             >
                             <a class="title-organizer">Organizador</a>
@@ -158,16 +184,9 @@
                               <a>{{name}}</a>
                               <a>{{surnames}}</a>
                                 <!-- Aquí iría el nombre del convocante -->
-                            </fieldset>
-                          </div>
+                          </fieldset>
+                        </div>
                     </div>
-                    <textarea
-                        class="input-observations"
-                        type="text"
-                        [(ngModel)]="observations"
-                        placeholder="Observaciones (Opcional)"
-                        ></textarea>
-                  </div>
 
                 </fieldset>
   

@@ -34,21 +34,33 @@ export class RegisterComponent {
   pwd2: string = '';
   profileImageUrl: string | ArrayBuffer | null =
     '../../assets/register/userDefault.png';
+  
+  errorEmail: string = 'Rellene este campo.';
+  errorName: string = 'Rellene este campo.';
+  errorSurnames: string = 'Rellene este campo.';
+  errorCenter: string = 'Rellene este campo.';
+  errorDate: string = 'Rellene este campo.';
+  errorPwd1: string = 'Rellene este campo.';
+  errorPwd2: string = 'Rellene este campo.';
   error: string = '';
   showPassword: boolean = false;
 
   isInvalidName: boolean = true;
   isInvalidSurnames: boolean = true;
-  isInvalidPassword: boolean = false;
+  isInvalidPassword: boolean = true;
   isInvalidPassword2: boolean = true;
+  isInvalidCenter: boolean = true;
+  isInvalidDate: boolean = true;
   isInvalidEmail: boolean = true;
   isInvalidForm: boolean = true;
 
-  isEmptyName: boolean = true;
-  isEmptySurnames: boolean = true;
-  isEmptyPassword: boolean = true;
-  isEmptyPassword2: boolean = true;
-  isEmptyEmail: boolean = true;
+  checkingName: boolean = true;
+  checkingSurnames: boolean = true;
+  checkingCenter: boolean = true;
+  checkingDate: boolean = true;
+  checkingPassword: boolean = true;
+  checkingPassword2: boolean = true;
+  checkingEmail: boolean = true;
   constructor(
     private readonly registerService: RegisterService,
     private readonly router: Router,
@@ -56,6 +68,8 @@ export class RegisterComponent {
   ) {}
 
   register() {
+    this.error='';
+    this.checkAll();
     if (!this.isInvalidForm) {
       if (typeof this.profileImageUrl === 'string') {
         // Eliminar el prefijo base64 si existe
@@ -83,7 +97,7 @@ export class RegisterComponent {
                   data: { qr_code: resultado.qr_code },
                 }
               );
-              dialogRef.afterClosed().subscribe((resultado: any) => { //COmprobar, he metido la pezuña GONZALO
+              dialogRef.afterClosed().subscribe((resultado: any) => {
                 if (resultado) {
                   this.router.navigate(['/']);
                   window.scrollTo(0, 0);
@@ -92,26 +106,41 @@ export class RegisterComponent {
             }
           },
           (error) => {
-            this.error = error.error.message;
+            this.error=error.error.message;
           }
         );
       }
-    } else {
-      this.error = 'Rellene todos los campos obligatorios sin errores';
-    }
+      
   }
+}
 
   validateName(): void {
-    this.isEmptyName = this.name.trim() == '';
+    this.checkingName = true;
+    if(this.name.trim()===''){
+      this.errorName='Rellene este campo.';
+      this.isInvalidName=true;
+    }
     // Si contiene números u otros caracteres, se marca como inválido.
-    this.isInvalidName = this.noNumbers(this.name);
+    else if(this.noNumbers(this.name)){
+      this.errorName='Este campo no debe contener números.';
+      this.isInvalidName=true;
+    }else
+      this.isInvalidName=false;
     this.checkFormValidity();
   }
 
   validateSurnames(): void {
-    this.isEmptySurnames = this.surnames.trim() == '';
+    this.checkingSurnames = true;
+    if(this.surnames.trim()===''){
+      this.errorSurnames='Rellene este campo.';
+      this.isInvalidSurnames=true;
+    }
     // Si contiene números u otros caracteres, se marca como inválido.
-    this.isInvalidSurnames = this.noNumbers(this.surnames);
+    else if(this.noNumbers(this.surnames)){
+      this.errorSurnames='Este campo no debe contener números.';
+      this.isInvalidSurnames=true;
+    }else
+      this.isInvalidSurnames=false;
     this.checkFormValidity();
   }
 
@@ -125,17 +154,47 @@ export class RegisterComponent {
     return isInvalid;
   }
 
+  validateCenter(): void {
+    this.checkingCenter = true;
+    // Si contiene números u otros caracteres, se marca como inválido.
+    this.isInvalidCenter = this.center.trim() === '';
+    this.checkFormValidity();
+  }
+
+  validateDate(): void {
+    this.checkingDate = true;
+    // Si contiene números u otros caracteres, se marca como inválido.
+    this.isInvalidDate = this.discharge_date.trim() === '';
+    this.checkFormValidity();
+  }
+
   validatePassword(): void {
-    this.isEmptyPassword = this.pwd1.trim() == '';
-    this.isInvalidPassword = this.passwordRequirements(this.pwd1);
+    this.checkingPassword = true;
+    if(this.pwd1.trim()===''){
+      this.errorPwd1='Rellene este campo.';
+      this.isInvalidPassword=true;
+    }
+    // Si contiene números u otros caracteres, se marca como inválido.
+    else if(this.passwordRequirements(this.pwd1)){
+      this.errorPwd1='La contraseña debe contener al menos 8 caracteres, 1 mayúscula, 1 minúscula, 1 carácter especial y 1 número.';
+      this.isInvalidPassword = true;
+    }else
+      this.isInvalidPassword=false;
     this.validatePassword2();
     this.checkFormValidity();
   }
 
   validatePassword2(): void {
-    this.isEmptyPassword2 = this.pwd2.trim() == '';
-    this.isInvalidPassword2 =
-      this.pwd1 !== this.pwd2 || this.passwordRequirements(this.pwd2);
+    this.checkingPassword2 = true;
+    if(this.pwd2.trim()===''){
+      this.errorPwd2='Rellene este campo.';
+      this.isInvalidPassword2=true;
+    }
+    else if(this.pwd1 !== this.pwd2){
+      this.errorPwd2='No coincide con la contraseña';
+      this.isInvalidPassword2=true;
+    }else
+      this.isInvalidPassword2=false;
     this.checkFormValidity();
   }
 
@@ -183,24 +242,37 @@ export class RegisterComponent {
 
   validateEmail(): void {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    this.isEmptyEmail = this.email.trim() === '';
-    this.isInvalidEmail = !emailRegex.test(this.email);
+    this.checkingEmail = true;
+    if(this.email.trim()===''){
+      this.errorEmail='Rellene este campo.';
+      this.isInvalidEmail=true;
+    }
+    else if(!emailRegex.test(this.email)){
+      this.errorEmail='Este formato de email no es válido.';
+      this.isInvalidEmail = true;
+    }else
+      this.isInvalidEmail=false;
     this.checkFormValidity();
   }
 
   checkFormValidity() {
     this.isInvalidForm =
       this.isInvalidName ||
-      this.isEmptyName ||
       this.isInvalidSurnames ||
-      this.isEmptySurnames ||
-      this.center.trim() === '' ||
-      this.discharge_date.trim() === '' ||
+      this.isInvalidCenter ||
+      this.isInvalidDate ||
       this.isInvalidEmail ||
-      this.isEmptyEmail ||
       this.isInvalidPassword ||
-      this.isEmptyPassword ||
-      this.isEmptyPassword2 ||
       this.isInvalidPassword2;
+  }
+
+  checkAll(){
+    this.checkingCenter=false;
+    this.checkingDate=false;
+    this.checkingEmail=false;
+    this.checkingName=false;
+    this.checkingPassword=false;
+    this.checkingPassword2=false;
+    this.checkingSurnames=false;
   }
 }
